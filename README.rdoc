@@ -1,0 +1,3 @@
+= EnjuT84SelfCheckout
+
+This project rocks and uses MIT-LICENSE.
