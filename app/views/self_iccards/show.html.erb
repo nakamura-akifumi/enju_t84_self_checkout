@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Card:</strong>
+  <%= @self_iccard.card_id %>
+</p>
+
+<p>
+  <strong>User:</strong>
+  <%= @self_iccard.user_id %>
+</p>
+
+<%= link_to 'Edit', edit_self_iccard_path(@self_iccard) %> |
+<%= link_to 'Back', self_iccards_path %>

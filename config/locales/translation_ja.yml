@@ -1,0 +1,16 @@
+ja:
+  activerecord:
+    models:
+      self_iccard: ICカード
+
+    attributes:
+      self_iccard:
+        card_id: カードID
+        user_id: 利用者ID
+        user_name: 利用者名
+
+  self_iccard:
+    item_not_found: "が見つかりません。"
+    enter_item_identifier: "所蔵情報番号を入力してください。"
+    already_accepted: "はすでに検収されています。"
+    successfully_accepted: "この資料は正常に検収されました。"
