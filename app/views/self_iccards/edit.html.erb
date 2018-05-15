@@ -1,6 +1,13 @@
-<h1>Editing Self Iccard</h1>
+<div id="content_detail" class="ui-corner-all ui-widget-content">
+  <h1 class="title"><%= t('page.editing', model: t('activerecord.models.self_iccard')) -%></h1>
+  <div id="content_list">
+    <%= render 'form' %>
+  </div>
+</div>
 
-<%= render 'form' %>
-
-<%= link_to 'Show', @self_iccard %> |
-<%= link_to 'Back', self_iccards_path %>
+<div id="submenu" class="ui-corner-all ui-widget-content">
+  <ul>
+    <li><%= link_to t('page.show'), @self_iccard -%></li>
+    <li><%= link_to t('page.back'), self_iccards_path -%></li>
+  </ul>
+</div>

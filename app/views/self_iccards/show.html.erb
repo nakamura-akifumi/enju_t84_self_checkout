@@ -1,14 +1,29 @@
-<p id="notice"><%= notice %></p>
+<div id="content_detail" class="ui-corner-all ui-widget-content">
+  <h1 class="title"><%= t('page.showing', model: t('activerecord.models.self_iccard')) -%></h1>
+  <div id="content_list">
+    <p id="notice"><%= notice %></p>
 
-<p>
-  <strong>Card:</strong>
-  <%= @self_iccard.card_id %>
-</p>
+    <p>
+      <strong><%= t('activerecord.attributes.self_iccard.card_id') -%>:</strong>
+      <%= @self_iccard.card_id %>
+    </p>
 
-<p>
-  <strong>User:</strong>
-  <%= @self_iccard.user_id %>
-</p>
+    <p>
+      <strong><%= t('activerecord.attributes.self_iccard.user_name') -%>:</strong>
+      <%= @self_iccard.user_name %>
+    </p>
 
-<%= link_to 'Edit', edit_self_iccard_path(@self_iccard) %> |
-<%= link_to 'Back', self_iccards_path %>
+  </div>
+</div>
+
+<div id="submenu" class="ui-corner-all ui-widget-content">
+  <ul>
+    <li><%= link_to t('page.back'), :back -%></li>
+    <% if policy(@self_iccard).update? %>
+      <li><%= link_to t('page.edit'), edit_self_iccard_path(@self_iccard) -%></li>
+    <% end %>
+    <% if policy(@self_iccard).destroy? %>
+      <li><%= link_to t('page.destroy'), self_iccards_path(@self_iccard), data: {confirm: t('page.are_you_sure')}, method: :delete -%></li>
+    <% end %>
+  </ul>
+</div>

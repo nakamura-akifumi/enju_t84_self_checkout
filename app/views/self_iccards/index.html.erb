@@ -1,35 +1,34 @@
-<% if flash[:notice] %>
-  <div style="color:red"><%= flash[:notice] %></div>
-<% end %>
 <div id="content_detail" class="ui-corner-all ui-widget-content">
   <h1 class="title"><%= t('page.listing', model: t('activerecord.models.self_iccard')) -%></h1>
   <div id="content_list">
+    <p id="notice"><%= notice %></p>
 
-<table>
-  <thead>
-    <tr>
-      <th><%= t('activerecord.attributes.self_iccard.card_id') -%></th>
-      <th><%= t('activerecord.attributes.self_iccard.user_name') -%></th>
-      <th></th>
-    </tr>
-  </thead>
+    <table class="table table-striped index">
+      <thead>
+        <tr>
+          <th><%= t('activerecord.attributes.self_iccard.card_id') -%></th>
+          <th><%= t('activerecord.attributes.self_iccard.user_name') -%></th>
+          <th></th>
+        </tr>
+      </thead>
 
-  <tbody>
-    <% @self_iccards.each do |self_iccard| %>
-      <tr>
-        <td><%= self_iccard.card_id %></td>
-        <td><%= self_iccard.user.name %></td>
-        <td><%= link_to 'Show', self_iccard %></td>
-        <td><%= link_to 'Edit', edit_self_iccard_path(self_iccard) %></td>
-        <td><%= link_to 'Destroy', self_iccard, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+      <tbody>
+        <% @self_iccards.each do |self_iccard| %>
+          <tr class="line<%= cycle("0", "1") -%>">
+            <td><%= self_iccard.card_id %></td>
+            <td><%= self_iccard.user_name %></td>
+            <td>
+              <%= link_to t('page.edit'), edit_self_iccard_path(self_iccard) -%>
+              <%= link_to t('page.destroy'), self_iccard, data: {confirm: t('page.are_you_sure')}, method: :delete -%>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
 
 <%= paginate(@self_iccards) %>
 
-</div>
+  </div>
 </div>
 
 <div id="submenu" class="ui-corner-all ui-widget-content">

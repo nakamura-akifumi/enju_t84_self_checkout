@@ -30,6 +30,7 @@ class SelfIccardsController < ApplicationController
     search.query.paginate(page.to_i, SelfIccard.default_per_page)
     @self_iccards = search.execute!.results
 
+    @users = card_users
   end
 
   # GET /self_iccards/1
@@ -39,10 +40,12 @@ class SelfIccardsController < ApplicationController
   # GET /self_iccards/new
   def new
     @self_iccard = SelfIccard.new
+    @users = card_users
   end
 
   # GET /self_iccards/1/edit
   def edit
+    @users = card_users
   end
 
   # POST /self_iccards
@@ -50,8 +53,9 @@ class SelfIccardsController < ApplicationController
     @self_iccard = SelfIccard.new(self_iccard_params)
 
     if @self_iccard.save
-      redirect_to @self_iccard, notice: 'Self iccard was successfully created.'
+      redirect_to @self_iccard, notice: t('controller.successfully_created', model: t('activerecord.models.self_iccard'))
     else
+      @users = card_users
       render :new
     end
   end
@@ -59,7 +63,7 @@ class SelfIccardsController < ApplicationController
   # PATCH/PUT /self_iccards/1
   def update
     if @self_iccard.update(self_iccard_params)
-      redirect_to @self_iccard, notice: 'Self iccard was successfully updated.'
+      redirect_to @self_iccard, notice: t('controller.successfully_updated', model: t('activerecord.models.self_iccard'))
     else
       render :edit
     end
@@ -68,7 +72,7 @@ class SelfIccardsController < ApplicationController
   # DELETE /self_iccards/1
   def destroy
     @self_iccard.destroy
-    redirect_to self_iccards_url, notice: 'Self iccard was successfully destroyed.'
+    redirect_to self_iccards_url, notice: t('controller.successfully_deleted', model: t('activerecord.models.self_iccard'))
   end
 
   private
@@ -85,5 +89,14 @@ class SelfIccardsController < ApplicationController
     # Only allow a trusted parameter "white list" through.
     def self_iccard_params
       params.require(:self_iccard).permit(:card_id, :user_id)
+    end
+
+    def card_users
+      users = User.all.inject([]) do |arr, u|
+        arr << [(u.profile.full_name.blank?)?(u.username):(u.profile.full_name), u.id]
+        arr
+      end
+
+      users
     end
 end

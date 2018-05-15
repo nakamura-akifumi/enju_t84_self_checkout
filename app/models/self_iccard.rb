@@ -6,10 +6,14 @@ class SelfIccard < ActiveRecord::Base
   searchable do
     text :card_id
     text :user_name do
-      user.name
+      user_name
     end
     integer :user_id
   end
 
   paginates_per 10
+
+  def user_name
+    (user.profile.full_name.blank?)?(user.username):(user.profile.full_name)
+  end
 end

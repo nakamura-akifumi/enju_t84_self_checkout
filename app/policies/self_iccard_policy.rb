@@ -1,8 +1,22 @@
 class SelfIccardPolicy < ApplicationPolicy
   def index?
-    true
+    true if user.try(:has_role?, 'Librarian')
   end
+
+  def show?
+    true if user.try(:has_role?, 'Librarian')
+  end
+
   def create?
-    true
+    true if user.try(:has_role?, 'Librarian')
   end
+
+  def update?
+    true if user.try(:has_role?, 'Librarian')
+  end
+
+  def destroy?
+    true if user.try(:has_role?, 'Librarian')
+  end
+
 end
