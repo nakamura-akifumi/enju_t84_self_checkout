@@ -35,6 +35,7 @@
   <ul>
     <%- if policy(SelfIccard).create? -%>
       <li><%= link_to t('page.new', model: t('activerecord.models.self_iccard')), new_self_iccard_path -%></li>
+      <li><%= link_to t('self_iccard.bulk_regist'), new_id_card_import_file_path -%></li>
     <%- end -%>
   </ul>
 </div>

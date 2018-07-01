@@ -14,6 +14,10 @@ class SelfIccard < ActiveRecord::Base
   paginates_per 10
 
   def user_name
-    (user.profile.full_name.blank?)?(user.username):(user.profile.full_name)
+    if user
+      (user.profile.full_name.blank?)?(user.username):(user.profile.full_name)
+    else
+      ''
+    end
   end
 end

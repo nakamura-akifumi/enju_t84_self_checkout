@@ -1,7 +1,8 @@
 ja:
   activerecord:
     models:
-      self_iccard: ICカード
+      self_iccard: IDカード
+      id_card_import_file: IDカード情報ファイル
 
     attributes:
       self_iccard:
@@ -9,8 +10,18 @@ ja:
         user_id: 利用者ID
         user_name: 利用者名
 
+      id_card_import_file:
+        id: "ID"
+        id_card_import_file_name: "ファイル名"
+        executed_at: "処理日時"
+        edit_mode: "編集モード"
+        user_encoding: "テキストファイルのエンコーディング"
+        state: "処理状況"
   self_iccard:
     item_not_found: "が見つかりません。"
     enter_item_identifier: "所蔵情報番号を入力してください。"
     already_accepted: "はすでに検収されています。"
     successfully_accepted: "この資料は正常に検収されました。"
+    bulk_regist: "カード情報一括登録"
+
+

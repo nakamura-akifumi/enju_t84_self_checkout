@@ -1,6 +1,19 @@
 class SelfIccardsController < ApplicationController
   before_action :set_self_iccard, only: [:show, :edit, :update, :destroy]
   before_action :check_policy, only: [:index, :new, :create]
+  skip_after_action :verify_authorized, only: [:translate_from_tag]
+
+  protect_from_forgery :except => [:translate_from_tag]
+
+  # POST /t
+  def translate_from_tag
+    @status = 200
+    @card = SelfIccard.where(card_id: params[:tag]).first
+    if @card.blank?
+      @status = 404
+      @card = SelfIccard.new
+    end
+  end
 
   # GET /self_iccards
   def index
