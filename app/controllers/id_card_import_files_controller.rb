@@ -17,9 +17,9 @@ class IdCardImportFilesController < ApplicationController
 
     if @id_card_import_file.save
       if @id_card_import_file.mode == 'import'
-        UserImportFileJob.perform_later(@id_card_import_file)
+        IdCardImportFileJob.perform_later(@id_card_import_file)
       end
-      redirect_to @id_card_import_file, notice: t('import.successfully_created', model: t('activerecord.models.user_import_file'))
+      redirect_to @id_card_import_file, notice: t('import.successfully_created', model: t('activerecord.models.id_card_import_file'))
     else
       prepare_options
       render action: "new"
@@ -30,7 +30,8 @@ class IdCardImportFilesController < ApplicationController
   end
 
   def destroy
-
+    @id_card_import_file.destroy
+    redirect_to(id_card_import_files_url)
   end
 
   private

@@ -8,7 +8,6 @@ class IdCardImportFilePolicy < ApplicationPolicy
   end
 
   def create?
-    puts "@@@ aaa"
     true if user.try(:has_role?, 'Librarian')
   end
 

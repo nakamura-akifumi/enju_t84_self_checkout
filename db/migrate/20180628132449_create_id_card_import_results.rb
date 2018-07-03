@@ -4,6 +4,7 @@ class CreateIdCardImportResults < ActiveRecord::Migration
       t.references :id_card_import_file, index: true
       t.references :self_iccard, index: true
       t.text :body
+      t.text :error_message
 
       t.timestamps
     end

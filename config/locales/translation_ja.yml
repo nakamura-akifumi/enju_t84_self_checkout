@@ -17,6 +17,8 @@ ja:
         edit_mode: "編集モード"
         user_encoding: "テキストファイルのエンコーディング"
         state: "処理状況"
+        id_card_import_file_size: "ファイルサイズ(Byte)"
+
   self_iccard:
     item_not_found: "が見つかりません。"
     enter_item_identifier: "所蔵情報番号を入力してください。"
