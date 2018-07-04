@@ -38,7 +38,7 @@ class IdCardImportFile < ActiveRecord::Base
     Rails.logger.info "#{Time.zone.now} importing resources failed!"
   end
 
-  # 利用者情報をTSVファイルを用いて作成します。
+  # IDカード情報をTSVファイルを用いて作成します。
   def import
     transition_to!(:started)
     num = { card_found: 0, id_card_imported: 0, user_found: 0, failed: 0, error: 0 }
@@ -123,6 +123,101 @@ class IdCardImportFile < ActiveRecord::Base
     raise e
   end
 
+  # IDカード情報をTSVファイルを用いて更新します。
+  def modify
+    transition_to!(:started)
+    num = { id_card_updated: 0, id_card_not_found: 0, user_not_found: 0, failed: 0 }
+    rows = open_import_file(create_import_temp_file(id_card_import))
+    row_num = 1
+
+    field = rows.first
+    if [field['card_id']].reject{|f| f.to_s.strip == ""}.empty?
+      raise "card_id column is not found"
+    end
+
+    rows.each do |row|
+      row_num += 1
+      next if row['dummy'].to_s.strip.present?
+      import_result = IdCardImportResult.create!(
+          id_card_import_file_id: id, body: row.fields.join("\t")
+      )
+
+      card_id = row['card_id']
+      ic_card = SelfIccard.where(card_id: card_id).first
+      if ic_card
+        profile = Profile.where(user_number: row['user_number']).first
+        unless profile
+          logger.debug "unless profile: #{row['user_number']}"
+          num[:user_not_found] += 1
+          next
+        end
+
+        ic_card.user = profile.user
+        SelfIccard.transaction do
+          if ic_card.save
+            num[:id_card_updated] += 1
+            import_result.self_iccard = ic_card
+            import_result.save!
+          else
+            num[:failed] += 1
+          end
+        end
+      else
+        num[:id_card_not_found] += 1
+      end
+    end
+
+    rows.close
+    transition_to!(:completed)
+    Sunspot.commit
+    send_message
+    num
+  rescue => e
+    self.error_message = "line #{row_num}: #{e.message}"
+    save
+    transition_to!(:failed)
+    raise e
+  end
+
+  # IDカード情報をTSVファイルを用いて削除します。
+  def remove
+    transition_to!(:started)
+    num = { id_card_removed: 0, id_card_not_found: 0, failed: 0 }
+    row_num = 1
+    rows = open_import_file(create_import_temp_file(id_card_import))
+
+    field = rows.first
+    if [field['card_id']].reject{ |f| f.to_s.strip == "" }.empty?
+      raise "card_id column is not found"
+    end
+
+    rows.each do |row|
+      row_num += 1
+      card_id = row['card_id'].to_s.strip
+      remove_card = SelfIccard.find_by(card_id: card_id)
+      if remove_card
+        #TODO
+        #if remove_card.try(:deletable_by?, user)
+          IdCardImportFile.transaction do
+            remove_card.destroy
+            num[:id_card_removed] += 1
+          end
+        #end
+      else
+        logger.info "id_card_not_found"
+        num[:id_card_not_found] += 1
+      end
+    end
+    transition_to!(:completed)
+    send_message
+  rescue => e
+    self.error_message = "line #{row_num}: #{e.message}"
+    save
+    transition_to!(:failed)
+    raise e
+  end
+
+
   def open_import_file(tempfile)
     file = CSV.open(tempfile.path, 'r:utf-8', col_sep: "\t")
     header_columns = %w(
@@ -140,6 +235,10 @@ class IdCardImportFile < ActiveRecord::Base
     tempfile.close(true)
     file.close
     rows
+  end
+
+  def self.initial_state
+    :pending
   end
 
 end
