@@ -3,6 +3,7 @@ ja:
     models:
       self_iccard: IDカード
       id_card_import_file: IDカード情報ファイル
+      id_card_import_result: IDカード情報インポートの結果
 
     attributes:
       self_iccard:
@@ -18,6 +19,10 @@ ja:
         user_encoding: "テキストファイルのエンコーディング"
         state: "処理状況"
         id_card_import_file_size: "ファイルサイズ(Byte)"
+
+      id_card_import_result:
+        lineno: "行"
+        body: "内容"
 
   self_iccard:
     item_not_found: "が見つかりません。"

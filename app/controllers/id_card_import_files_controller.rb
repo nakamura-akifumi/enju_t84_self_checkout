@@ -27,6 +27,25 @@ class IdCardImportFilesController < ApplicationController
   end
 
   def show
+    if @id_card_import_file.id_card_import.path
+      unless ENV['ENJU_STORAGE'] == 's3'
+        file = @id_card_import_file.id_card_import.path
+      end
+    end
+    @id_card_import_results = @id_card_import_file.id_card_import_results.page(params[:page])
+
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @id_card_import_file }
+      format.download {
+        if ENV['ENJU_STORAGE'] == 's3'
+          send_data Faraday.get(@id_card_import_file.id_card_import.expiring_url).body.force_encoding('UTF-8'),
+                    filename: File.basename(@id_card_import_file.id_card_import_file_name), type: 'application/octet-stream'
+        else
+          send_file file, filename: @id_card_import_file.id_card_import_file_name, type: 'application/octet-stream'
+        end
+      }
+    end
   end
 
   def destroy

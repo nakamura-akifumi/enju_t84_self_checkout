@@ -1,0 +1,24 @@
+<h2><%= t('activerecord.models.id_card_import_result') %></h2>
+<table class="table table-striped index">
+  <tr>
+    <th><%= t('activerecord.attributes.id_card_import_result.lineno') %></th>
+    <th><%= t('activerecord.attributes.id_card_import_result.body') %></th>
+    <th><%= t('activerecord.models.user') %></th>
+    <th></th>
+  </tr>
+  <% @id_card_import_results.each_with_index do |id_card_import_result, idx| %>
+    <tr class="line<%= cycle("0", "1") -%>">
+      <td><%= @id_card_import_results.offset_value + idx + 1 %></td>
+      <td><%= id_card_import_result.body.inspect %></td>
+      <td>
+        <% if id_card_import_result.self_iccard && id_card_import_result.self_iccard.user.try(:profile) %>
+        <%= link_to id_card_import_result.self_iccard.user.username, id_card_import_result.self_iccard.user.profile %>
+        <% end %>
+      </td>
+      <td>
+        <%= link_to t('page.show'), id_card_import_result %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+<%= paginate(@id_card_import_results) %>
