@@ -8,10 +8,29 @@ class SelfIccardsController < ApplicationController
   # POST /t
   def translate_from_tag
     @status = 200
-    @card = SelfIccard.where(card_id: params[:tag]).first
-    if @card.blank?
-      @status = 404
-      @card = SelfIccard.new
+
+    # check cert string
+    if params['cert'].blank?
+      logger.info("error: no cert")
+    end
+
+    # action
+    if params['action'].blank?
+      logger.info("error: no action")
+    end
+    unless %w(cardid2userid checkout checkin).include?(params['send_event'])
+      logger.info("error: action error (#{params['send_event']})")
+    end
+
+    case params['send_event']
+    when 'cardid2userid'
+      @card = SelfIccard.where(card_id: params[:tag]).first
+      if @card.blank?
+        @status = 404
+        @card = SelfIccard.new
+      end
+    when 'checkout'
+    when 'checkin'
     end
   end
 
@@ -34,11 +53,7 @@ class SelfIccardsController < ApplicationController
         fulltext query
       end
     end
-=begin
-    search.build do
-      order_by sort[:sort_by], sort[:order]
-    end
-=end
+
     page = params[:page] || 1
     search.query.paginate(page.to_i, SelfIccard.default_per_page)
     @self_iccards = search.execute!.results
