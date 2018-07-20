@@ -12,25 +12,110 @@ class SelfIccardsController < ApplicationController
     # check cert string
     if params['cert'].blank?
       logger.info("error: no cert")
+      @results = {status: 400, errors: [{status: 400, message: 'no cert'}]}
+      render :json => @results
+      return
     end
 
     # action
-    if params['action'].blank?
-      logger.info("error: no action")
+    if params['event'].blank?
+      logger.info("error: no event")
+      @results = {status: 400, errors: [{status: 401, message: 'no event'}]}
+      render :json => @results
+      return
     end
-    unless %w(cardid2userid checkout checkin).include?(params['send_event'])
-      logger.info("error: action error (#{params['send_event']})")
+    unless %w(cardid2userid checkout checkin).include?(params['event'])
+      logger.info("error: event error [unknown event] (#{params['event']})")
+      @results = {status: 400, errors: [{status: 402, message: 'unknown event'}]}
+      render :json => @results
+      return
     end
 
-    case params['send_event']
+    case params['event']
     when 'cardid2userid'
+      if params[:tag].blank?
+        @results = {status: 400, errors: [{status: 500, message: 'no tag'}]}
+        render :json => @results
+        return
+      end
+
       @card = SelfIccard.where(card_id: params[:tag]).first
       if @card.blank?
-        @status = 404
-        @card = SelfIccard.new
+        @results = {status: 400, errors: [{status: 501, message: 'invalid tag'}]}
+        render :json => @results
+        return
       end
+
+      @results = {}
+      @results['status'] = 200
+      @results['results'] = [{
+            'user_id' => @card.user.id,
+            'user_number' => @card.user.profile.user_number,
+            'name' => @card.user_name,
+      }]
+      render :json => @results
+      return
+
     when 'checkout'
+      if params[:user_number].blank?
+        @results = {status: 400, errors: [{status: 520, message: 'no user_number'}]}
+        render :json => @results
+        return
+      end
+
+      profile = Profile.where(user_number: params[:user_number]).first
+      if profile.blank?
+        @results = {status: 400, errors: [{status: 521, message: 'invalid user_number'}]}
+        render :json => @results
+        return
+      end
+
+      if params[:item_identifier].blank?
+        @results = {status: 400, errors: [{status: 522, message: 'no item_identifier'}]}
+        render :json => @results
+        return
+      end
+
+      item = Item.where(item_identifier: params[:item_identifier]).first
+      if item.blank?
+        @results = {status: 400, errors: [{status: 523, message: 'invalid item_identifier'}]}
+        render :json => @results
+        return
+      end
+
+      user_number = profile.user_number
+      item_identifier = item.item_identifier
+
+      c = EnjuAdapter.new
+      c.checkout(user_number, item_identifier)
+
+      @results = {status: 200}
+      render :json => @results
+      return
+
+
     when 'checkin'
+
+      if params[:item_identifier].blank?
+        @results = {status: 400, errors: [{status: 622, message: 'no item_identifier'}]}
+        render :json => @results
+        return
+      end
+
+      item = Item.where(item_identifier: params[:item_identifier]).first
+      if item.blank?
+        @results = {status: 400, errors: [{status: 623, message: 'invalid item_identifier'}]}
+        render :json => @results
+        return
+      end
+
+      c = EnjuAdapter.new
+      c.checkin(item.item_identifier)
+
+      @results = {status: 200}
+      render :json => @results
+      return
+
     end
   end
 
