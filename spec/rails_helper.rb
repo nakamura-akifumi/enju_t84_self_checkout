@@ -11,7 +11,7 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require 'spec_helper'
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
-#require 'factory_bot'
+require 'factory_bot'
 #require 'sunspot-rails-tester'
 require 'rspec/active_model/mocks'
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }

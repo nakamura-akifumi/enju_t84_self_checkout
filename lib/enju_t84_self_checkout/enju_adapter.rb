@@ -93,7 +93,7 @@ class EnjuAdapter
 
     logger.debug "@6-2 token=#{token}"
     logger.debug "@7 set item"
-    checkout_newitem_item_url2 = "#{checkout_newitem_item_url}#{basket_i`d}"
+    checkout_newitem_item_url2 = "#{checkout_newitem_item_url}#{basket_id}"
     res = client.post checkout_newitem_item_url2, {:checked_item => {:item_identifier => item_identifier}, :authenticity_token => token}
     #puts res.body
     # {"base":["この資料はすでに貸し出されています。","この資料の貸出はできません。"]}

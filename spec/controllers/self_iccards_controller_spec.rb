@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe SelfIccardController do
+describe SelfIccardsController do
   describe 'POST translate_from_tag' do
     describe 'When logged in as Administrator' do
 
