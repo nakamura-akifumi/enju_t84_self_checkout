@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  note: MyText
+  edit_mode: MyString
+  error_message: MyText
+
+two:
+  note: MyText
+  edit_mode: MyString
+  error_message: MyText
