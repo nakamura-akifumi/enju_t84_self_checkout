@@ -1,4 +1,4 @@
-class SelfIccardPolicy < ApplicationPolicy
+class IdCardPolicy < ApplicationPolicy
   def index?
     true if user.try(:has_role?, 'Librarian')
   end

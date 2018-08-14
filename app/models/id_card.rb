@@ -1,4 +1,4 @@
-class SelfIccard < ActiveRecord::Base
+class IdCard < ActiveRecord::Base
   belongs_to :user, required: true
   validates :card_id, presence: true
   validates :card_id, uniqueness: true

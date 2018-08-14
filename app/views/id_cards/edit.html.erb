@@ -1,5 +1,5 @@
 <div id="content_detail" class="ui-corner-all ui-widget-content">
-  <h1 class="title"><%= t('page.new', model: t('activerecord.models.self_iccard')) -%></h1>
+  <h1 class="title"><%= t('page.editing', model: t('activerecord.models.id_card')) -%></h1>
   <div id="content_list">
     <%= render 'form' %>
   </div>
@@ -7,6 +7,7 @@
 
 <div id="submenu" class="ui-corner-all ui-widget-content">
   <ul>
-    <li><%= link_to t('page.back'), self_iccards_path -%></li>
+    <li><%= link_to t('page.show'), @id_card -%></li>
+    <li><%= link_to t('page.back'), id_cards_path -%></li>
   </ul>
 </div>

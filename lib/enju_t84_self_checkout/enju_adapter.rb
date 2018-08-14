@@ -33,7 +33,11 @@ class EnjuAdapter
     logger.debug "@2 get authenticity_token (loginform)"
     res = client.get login_url
     doc = Nokogiri::HTML.parse(res.body, nil, 'utf-8')
-    token = doc.xpath("//input[@name='authenticity_token']").attribute('value').text
+    token = doc.xpath("//input[@name='authenticity_token']").attribute('value').text rescue ''
+    if token.blank?
+      logger.info "not find authenticity_token"
+      puts doc
+    end
 
     logger.debug "@3 login"
     res = client.post login_url, {:user => {:username => login_id, :password => password}, :authenticity_token => token}
@@ -63,8 +67,28 @@ class EnjuAdapter
     client.headers['X-Requested-With'] = 'XMLHttpRequest'
     client.headers['X-CSRF-Token'] = token
     res = client.post checkin_commit_url2, {:checkin => {:item_identifier => item_identifier}}
-    logger.debug  res.body
-    # {"item_id":["を入力してください。"],"base":["資料が見つかりません。"]}
+
+    return JSON.parse(res.body)
+  end
+
+
+  def get_checkout_basket(user_number)
+    checkout_basket_form_url = "/baskets/new"
+    checkout_basket_url = "/baskets.json"
+
+    client = login
+
+    logger.debug "@4 get authenticity_token (basket form)"
+    res = client.get checkout_basket_form_url
+    doc = Nokogiri::HTML.parse(res.body, nil, 'utf-8')
+    token = doc.xpath("//input[@name='authenticity_token']").attribute('value').text
+
+    logger.debug "@5 create new basket"
+    res = client.post checkout_basket_url, {:basket => {:user_number => user_number}, :authenticity_token => token}
+    json = JSON.parse(res.body)
+    basket_id = json['id']
+
+    return basket_id
   end
 
   def checkout(user_number, item_identifier)
@@ -102,7 +126,7 @@ class EnjuAdapter
     checkout_commit_url2 = "#{checkout_commit_url}#{basket_id}"
     logger.debug "@8 #{checkout_commit_url2}"
     res = client.post checkout_commit_url2, {:_method => 'PUT', :authenticity_token => token}
-    #puts res.body
+    return JSON.parse(res.body)
   end
 
   private

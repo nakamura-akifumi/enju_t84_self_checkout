@@ -64,13 +64,13 @@ class IdCardImportFile < ActiveRecord::Base
 
       card_id = row['card_id']
 
-      new_card = SelfIccard.where(card_id: card_id).first
+      new_card = IdCard.where(card_id: card_id).first
       if new_card
         #import_result.user = new_user
         import_result.save
         num[:card_found] += 1
       else
-        new_card = SelfIccard.new
+        new_card = IdCard.new
         new_card.card_id = card_id
         profile = Profile.where(user_number: row['user_number']).first
         unless profile
@@ -80,7 +80,7 @@ class IdCardImportFile < ActiveRecord::Base
         else
           new_card.user = profile.user
 
-          SelfIccard.transaction do
+          IdCard.transaction do
             if new_card.valid?
               logger.debug "new_card valid"
               new_card.save!
@@ -143,7 +143,7 @@ class IdCardImportFile < ActiveRecord::Base
       )
 
       card_id = row['card_id']
-      ic_card = SelfIccard.where(card_id: card_id).first
+      ic_card = IdCard.where(card_id: card_id).first
       if ic_card
         profile = Profile.where(user_number: row['user_number']).first
         unless profile
@@ -153,7 +153,7 @@ class IdCardImportFile < ActiveRecord::Base
         end
 
         ic_card.user = profile.user
-        SelfIccard.transaction do
+        IdCard.transaction do
           if ic_card.save
             num[:id_card_updated] += 1
             import_result.self_iccard = ic_card
@@ -194,7 +194,7 @@ class IdCardImportFile < ActiveRecord::Base
     rows.each do |row|
       row_num += 1
       card_id = row['card_id'].to_s.strip
-      remove_card = SelfIccard.find_by(card_id: card_id)
+      remove_card = IdCard.find_by(card_id: card_id)
       if remove_card
         #TODO
         #if remove_card.try(:deletable_by?, user)

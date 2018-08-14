@@ -45,5 +45,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'faraday'
   s.add_development_dependency 'faraday_middleware'
   s.add_development_dependency 'faraday-cookie_jar'
+  s.add_development_dependency 'pry-rails'
 
 end

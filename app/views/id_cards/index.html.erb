@@ -1,0 +1,41 @@
+<div id="content_detail" class="ui-corner-all ui-widget-content">
+  <h1 class="title"><%= t('page.listing', model: t('activerecord.models.id_card')) -%></h1>
+  <div id="content_list">
+    <p id="notice"><%= notice %></p>
+
+    <table class="table table-striped index">
+      <thead>
+        <tr>
+          <th><%= t('activerecord.attributes.id_card.card_id') -%></th>
+          <th><%= t('activerecord.attributes.id_card.user_name') -%></th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% @id_cards.each do |id_card| %>
+          <tr class="line<%= cycle("0", "1") -%>">
+            <td><%= id_card.card_id %></td>
+            <td><%= id_card.user_name %></td>
+            <td>
+              <%= link_to t('page.edit'), edit_id_card_path(id_card) -%>
+              <%= link_to t('page.destroy'), id_card, data: {confirm: t('page.are_you_sure')}, method: :delete -%>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+<%= paginate(@id_cards) %>
+
+  </div>
+</div>
+
+<div id="submenu" class="ui-corner-all ui-widget-content">
+  <ul>
+    <%- if policy(IdCard).create? -%>
+      <li><%= link_to t('page.new', model: t('activerecord.models.id_card')), new_id_card_path -%></li>
+      <li><%= link_to t('id_card.bulk_regist'), new_id_card_import_file_path -%></li>
+    <%- end -%>
+  </ul>
+</div>

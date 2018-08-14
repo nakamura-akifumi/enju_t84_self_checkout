@@ -1,12 +1,12 @@
 ja:
   activerecord:
     models:
-      self_iccard: IDカード
+      id_card: IDカード
       id_card_import_file: IDカード情報ファイル
       id_card_import_result: IDカード情報インポートの結果
 
     attributes:
-      self_iccard:
+      id_card:
         card_id: カードID
         user_id: 利用者ID
         user_name: 利用者名
@@ -24,7 +24,7 @@ ja:
         lineno: "行"
         body: "内容"
 
-  self_iccard:
+  id_card:
     item_not_found: "が見つかりません。"
     enter_item_identifier: "所蔵情報番号を入力してください。"
     already_accepted: "はすでに検収されています。"

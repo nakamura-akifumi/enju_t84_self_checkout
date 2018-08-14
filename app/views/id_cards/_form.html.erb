@@ -1,9 +1,9 @@
-<%= form_for(@self_iccard) do |f| %>
+<%= form_for(@id_card) do |f| %>
   <%= f.error_messages -%>
 
   <div class="field">
     <%= f.label :card_id %><br>
-    <%= f.text_field :card_id %>
+    <%= f.text_field :card_id, :autofocus => true %>
   </div>
   <div class="field">
     <%= f.label :user_id %><br>

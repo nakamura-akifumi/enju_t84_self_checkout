@@ -1,10 +1,10 @@
 <div id="content_detail" class="ui-corner-all ui-widget-content">
-  <h1 class="title"><%= t('page.showing', model: t('activerecord.models.self_iccard')) -%></h1>
+  <h1 class="title"><%= t('page.showing', model: t('activerecord.models.id_card')) -%></h1>
   <div id="content_list">
     <p id="notice"><%= notice %></p>
 
     <p>
-      <strong><%= t('activerecord.attributes.self_iccard.card_id') -%>:</strong>
+      <strong><%= t('activerecord.attributes.id_card.card_id') -%>:</strong>
       <%= @self_iccard.card_id %>
     </p>
 
@@ -20,10 +20,10 @@
   <ul>
     <li><%= link_to t('page.back'), :back -%></li>
     <% if policy(@self_iccard).update? %>
-      <li><%= link_to t('page.edit'), edit_self_iccard_path(@self_iccard) -%></li>
+      <li><%= link_to t('page.edit'), edit_id_card_path(@id_card) -%></li>
     <% end %>
-    <% if policy(@self_iccard).destroy? %>
-      <li><%= link_to t('page.destroy'), self_iccards_path(@self_iccard), data: {confirm: t('page.are_you_sure')}, method: :delete -%></li>
+    <% if policy(@id_card).destroy? %>
+      <li><%= link_to t('page.destroy'), id_cards_path(@id_card), data: {confirm: t('page.are_you_sure')}, method: :delete -%></li>
     <% end %>
   </ul>
 </div>
