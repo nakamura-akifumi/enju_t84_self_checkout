@@ -101,6 +101,21 @@ class IdCardsController < ApplicationController
 
       c = EnjuAdapter.new
       result = c.add_checkout_item(session_value, basket_id, item_identifier)
+
+      logger.debug "@@9-1 add_checkout_item status"
+      logger.debug result.status
+      logger.debug "@@9-2 add_checkout_item status"
+      logger.debug result.body
+
+      if result.status == 422
+        error_msgs = JSON.parse(result.body)
+        msg = error_msgs['base'][0]
+        @results = {status: 422, errors: [{status: 422, message: msg}]}
+
+        render :json => @results
+        return
+      end
+
       @checked_items = CheckedItem.where(basket_id: basket_id).order('id desc')
       @result_checked_items = []
       @checked_items.each do |checked_item|
