@@ -24,7 +24,7 @@ class IdCardsController < ApplicationController
       render :json => @results
       return
     end
-    unless %w(cardid2userid checkout checkin getitem).include?(params['event'])
+    unless %w(cardid2userid cardid2userbascket add_checkout_item checkout checkin getitem).include?(params['event'])
       logger.info("error: event error [unknown event] (#{params['event']})")
       @results = {status: 400, errors: [{status: 402, message: 'unknown event'}]}
       render :json => @results
@@ -32,7 +32,7 @@ class IdCardsController < ApplicationController
     end
 
     case params['event']
-    when 'cardid2userid'
+    when 'cardid2userid', 'cardid2userbascket'
       if params[:tag].blank?
         @results = {status: 400, errors: [{status: 500, message: 'no tag'}]}
         render :json => @results
@@ -49,62 +49,33 @@ class IdCardsController < ApplicationController
       @results = {}
       @results['status'] = 200
       @results['results'] = [{
-            'user_id' => @card.user.id,
-            'user_number' => @card.user.profile.user_number,
-            'name' => @card.user_name,
-      }]
+                               'user_id' => @card.user.id,
+                               'user_number' => @card.user.profile.user_number,
+                               'name' => @card.user_name,
+                             }]
+
+      if params['event'] == 'cardid2userbascket'
+        # create new bascket
+        # TODO: slow!
+        c = EnjuAdapter.new
+        basket_id = c.get_checkout_basket(@card.user.profile.user_number)
+        @results['results'][0]['basket_id'] = basket_id
+        @results['results'][0]['session_value'] = c.cookie_value
+
+      end
+
       render :json => @results
       return
-
-    when 'getitem'
-      if params[:item_identifier].blank?
-        @results = {status: 400, errors: [{status: 510, message: 'no item_identifier'}]}
-        render :json => @results
-        return
-      end
-
-      item = Item.where(item_identifier: params[:item_identifier]).first
-      if item.blank?
-        @results = {status: 400, errors: [{status: 513, message: 'invalid item_identifier'}]}
-        render :json => @results
-        return
-      end
-
-      @results = {status: 200, item: {title: item.manifestation.title}}
-      render :json => @results
-      return
-
-    when 'get_checkout_basket'
-      if params[:user_number].blank?
-        @results = {status: 400, errors: [{status: 520, message: 'no user_number'}]}
-        render :json => @results
-        return
-      end
-
-      profile = Profile.where(user_number: params[:user_number]).first
-      if profile.blank?
-        @results = {status: 400, errors: [{status: 521, message: 'invalid user_number'}]}
-        render :json => @results
-        return
-      end
-
-      c = EnjuAdapter.new
-      res = c.get_checkout_basket(user_number)
-      puts res
 
     when 'add_checkout_item'
-      if params[:user_number].blank?
-        @results = {status: 400, errors: [{status: 520, message: 'no user_number'}]}
+      if params[:basket_id].blank?
+        @results = {status: 400, errors: [{status: 570, message: 'no basket_id'}]}
         render :json => @results
         return
       end
 
-      profile = Profile.where(user_number: params[:user_number]).first
-      if profile.blank?
-        @results = {status: 400, errors: [{status: 521, message: 'invalid user_number'}]}
-        render :json => @results
-        return
-      end
+      basket = Basket.find(params[:basket_id])
+      basket_id = basket.id
 
       if params[:item_identifier].blank?
         @results = {status: 400, errors: [{status: 522, message: 'no item_identifier'}]}
@@ -119,44 +90,49 @@ class IdCardsController < ApplicationController
         return
       end
 
-      user_number = profile.user_number
       item_identifier = item.item_identifier
 
+      if params[:session_value].blank?
+        @results = {status: 400, errors: [{status: 523, message: 'no session_value'}]}
+        render :json => @results
+        return
+      end
+      session_value = params[:session_value]
+
       c = EnjuAdapter.new
-      c.add_checkout_item(user_number, item_identifier)
+      result = c.add_checkout_item(session_value, basket_id, item_identifier)
+      @checked_items = CheckedItem.where(basket_id: basket_id).order('id desc')
+      @result_checked_items = []
+      @checked_items.each do |checked_item|
+        item = {}
+        item['name'] = checked_item.item.manifestation.original_title
+        item['item_identifier'] = checked_item.item.item_identifier
+        item['due_date'] = checked_item.due_date.strftime('%Y/%m/%d')
+        @result_checked_items << item
+      end
+
+      @results = {}
+      @results['status'] = 200
+      @results['results'] = {'status' => 'ok', 'items' => @result_checked_items}
+
+      render :json => @results
+      return
 
     when 'checkout'
-      if params[:user_number].blank?
-        @results = {status: 400, errors: [{status: 520, message: 'no user_number'}]}
+      if params[:session_value].blank?
+        @results = {status: 400, errors: [{status: 520, message: 'no session_value'}]}
         render :json => @results
         return
       end
 
-      profile = Profile.where(user_number: params[:user_number]).first
-      if profile.blank?
-        @results = {status: 400, errors: [{status: 521, message: 'invalid user_number'}]}
+      if params[:basket_id].blank?
+        @results = {status: 400, errors: [{status: 522, message: 'no basket_id'}]}
         render :json => @results
         return
       end
-
-      if params[:item_identifier].blank?
-        @results = {status: 400, errors: [{status: 522, message: 'no item_identifier'}]}
-        render :json => @results
-        return
-      end
-
-      item = Item.where(item_identifier: params[:item_identifier]).first
-      if item.blank?
-        @results = {status: 400, errors: [{status: 523, message: 'invalid item_identifier'}]}
-        render :json => @results
-        return
-      end
-
-      user_number = profile.user_number
-      item_identifier = item.item_identifier
 
       c = EnjuAdapter.new
-      c.checkout(user_number, item_identifier)
+      c.checkout(params[:session_value], params[:basket_id])
 
       @results = {status: 200}
       render :json => @results
