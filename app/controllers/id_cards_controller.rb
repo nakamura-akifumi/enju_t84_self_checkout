@@ -24,7 +24,7 @@ class IdCardsController < ApplicationController
       render :json => @results
       return
     end
-    unless %w(cardid2userid cardid2userbascket add_checkout_item checkout checkin getitem).include?(params['event'])
+    unless %w(cardid2userid cardid2userbascket add_checkout_item checkout checkin).include?(params['event'])
       logger.info("error: event error [unknown event] (#{params['event']})")
       @results = {status: 400, errors: [{status: 402, message: 'unknown event'}]}
       render :json => @results
@@ -101,11 +101,6 @@ class IdCardsController < ApplicationController
 
       c = EnjuAdapter.new
       result = c.add_checkout_item(session_value, basket_id, item_identifier)
-
-      logger.debug "@@9-1 add_checkout_item status"
-      logger.debug result.status
-      logger.debug "@@9-2 add_checkout_item status"
-      logger.debug result.body
 
       if result.status == 422
         error_msgs = JSON.parse(result.body)
